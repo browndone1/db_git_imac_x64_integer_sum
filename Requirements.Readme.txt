@@ -1,0 +1,52 @@
+These files were built on an iMac (Retina 5K, 27-inch, 2017) 
+    with  Intel 64x (i5)
+    
+Using:
+Xcode Version 14.2 (14C18)
+
+You will need Xcode 14.2
+You will need Matlab 2017b
+
+However, other combinations of versions of Matlab and Xcode
+    might work.
+
+Copy
+   libdysum.h
+   test*.m (test and example files)
+   To your Matlab working directory on your iMac
+
+
+GitHub Files:
+
+libdysum.dylib is available from GitHub
+         From:
+         browndone1/db_git_imac_x64_integer_sum
+         
+         Then recopy dylib guy to your Matlab working directory on your iMac.
+
+Note: When downloading txt file or m files from GitHub
+      First select file, then when open select   'raw'.
+      Then when open again, right click and select save as.
+
+
+To check for virus, you can run:
+
+    objdump -D -C libdysum.dylib
+
+  To see assembly code for each routine in libdysum.dylib
+  Which basically consists of a single add using
+      ie 
+         addq
+         addl
+  instructions to do the x64 register integer math
+  With overflow enabled.
+        
+Copy the test m files, which will explain
+ about register math vs Matlab math.
+
+These m file demonstrate how to call
+ The functions in libdysum.dylib
+
+
+
+
