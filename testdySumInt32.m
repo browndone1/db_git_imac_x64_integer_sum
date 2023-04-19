@@ -10,13 +10,14 @@
 % calling dynamic library functions is critical to prevent matlab from
 % converting your int32 to double precision. You cannot even copy int32
 % variables with out an int32() type cast
-
+clear
+USE_MEX = logical(1);  % Edit this to use dylib instead of mex file
 
 t2 = int32(2^31-1);
 t1 = int32(1);
 disp(' ')
 disp('@@')
-disp('CASE 1:  ADD 2 int32 numbers USING --Normal Matlab int32() math-- (not using REGISTER microprocessor math)')
+disp('CASE 1:  ADD two int32 numbers USING --Normal Matlab int32() math-- (not using REGISTER microprocessor math)')
 int32_MatlabValues = [t1,t2]
 disp('EXAMPLE CASE 1: Add ABOVE 2 int32 numbers INCORRECTLY using --Matlab int32() math-- (Note: REGISTER microprocessor math is DESIRED')
 
@@ -33,12 +34,16 @@ disp('INCORRECT BECAUSE:  result remained at MAX value of int32')
 %Demonstrate dySum32 dynamic library function that performs integer32 register
 %overflow like a microprocessor performs unsigned integer register overflow
 
-if libisloaded( 'libdysum' )
+if ~USE_MEX
+    
+    if libisloaded( 'libdysum' )
     unloadlibrary('libdysum');
-end;
-loadlibrary('libdysum');
+    end;
+    loadlibrary('libdysum');
 
-%libfunctionsview('libdysum')
+    %libfunctionsview('libdysum')
+end;
+
  
 
 n1 = int32(1);
@@ -57,8 +62,18 @@ disp('About to Test Execution USING Matlab int32() built-in ADDING method:  CORR
 
 disp('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
 disp('%%%% CASE 2 MATH CORRECT RESULT using dySum32 function: n1 + n2 = ?%%%')
+
+
+if USE_MEX 
+
+   CORRECT_SumInt32mathRESULT = mexSumInt32(n1,n2)
+      
+else
 [out1] = calllib('libdysum','dySum32',n1,n2); %%,output);
-CORRECT_SumInt32mathRESULT = int32(out1)  %Must use int32() type declation here
+CORRECT_SumInt32mathRESULT = int32(out1)  %Must use int32() type declation here    
+    
+end;
+
 disp('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
 
 disp('CORRECT BECAUSE:  the output rolled over to MAX negative value: -2147483648 ') 
@@ -66,4 +81,6 @@ disp('CORRECT BECAUSE:  the output rolled over to MAX negative value: -214748364
 
 
 
-unloadlibrary('libdysum');
+if ~ USE_MEX  
+    unloadlibrary('libdysum');
+end;

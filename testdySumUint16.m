@@ -12,6 +12,7 @@
 % variables without an uint16() type cast
 
 clear
+USE_MEX = logical(1);  % Edit this to use dylib instead of mex file
 
 t1 = uint16(1)
 t2 = uint16(2^16-1)
@@ -35,14 +36,14 @@ disp('INCORRECT 16bit result BECAUSE result remained at MAX value of uint16 = 65
 %Demonstrate libsysum function that performs uint16 register
 %overflow like a microprocessor performs signed uint16 register overflow
 
-%unloadlibrary('libdysum');
-if libisloaded( 'libdysum' )
+if ~USE_MEX
+    if libisloaded( 'libdysum' )
     unloadlibrary('libdysum');
-end;
+    end;
+    loadlibrary('libdysum');
 
-loadlibrary('libdysum');
-
-%libfunctionsview('libdysum')
+    %libfunctionsview('libdysum')
+end; 
  
 
 
@@ -58,14 +59,22 @@ output = uint16(33);
 out1 = uint16(44);
 
 disp('EXAMPLE CASE 2:  Add ABOVE 2 uint16 numbers CORRECTLY using --16 bit SIGNED integer Register math-- by calling "dySumUint16"  function')
-disp('About to Test Execution USING Matlab uint16() ADDING:  CORRECT_MexSumInt32mathRESULT = 1 + 65535')
+disp('About to Test Execution USING Matlab uint16() ADDING:  CORRECT_MexSumInt16mathRESULT = 1 + 65535')
 
 disp('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
 disp('%%%% CASE 2 MATH CORRECT RESULT using libdysum library %%%')
 
 %CORRECT_MexSumUint16mathRESULT = 
-[out1] = calllib('libdysum','dySumUint16',n1,n2,output);
-CORRECT_MexSumuint16mathRESULT = uint16(out1) %Must use uint16() type declation here
+%%[out1] = calllib('libdysum','dySumUint16',n1,n2,output);
+%%CORRECT_MexSumuint16mathRESULT = uint16(out1) %Must use uint16() type declation here
+
+if USE_MEX
+   CORRECT_MexSumUint16mathRESULT = mexSumUint16(n1,n2)   
+else   
+    
+  [out1] = calllib('libdysum','dySumUint16',n1,n2,output);
+  CORRECT_SumUint16mathRESULT = uint16(out1)  %Must use uint16() type declation here
+end;
 disp('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
 
 disp('CORRECT BECAUSE: the output rolled over to value: 0 ') 
@@ -73,4 +82,6 @@ disp('CORRECT BECAUSE: the output rolled over to value: 0 ')
 
 
 
+if ~ USE_MEX  
 unloadlibrary('libdysum');
+end;

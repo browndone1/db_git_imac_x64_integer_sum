@@ -11,6 +11,9 @@
 % converting your uint64 to double precision. You cannot even copy uint64
 % variables without an uint64() type cast
 
+clear
+USE_MEX = logical(1);  % Edit this to use dylib instead of mex file
+
 t1 = uint64(1);
 t2 = uint64(2^64-1);
 
@@ -33,14 +36,14 @@ disp('INCORRECT BECAUSE:  result remained at MAX value of uint64 = 1844674407370
 %Demonstrate dySumUint64 dynamic library function that performs integer64 register
 %overflow like a microprocessor performs unsigned integer register overflow
 
-if libisloaded( 'libdysum' )
+if ~USE_MEX
+    if libisloaded( 'libdysum' )
     unloadlibrary('libdysum');
-end;
-loadlibrary('libdysum');
+    end;
+    loadlibrary('libdysum');
 
-%libfunctionsview('libdysum')
- 
-%return
+    %libfunctionsview('libdysum')
+end; 
 
 n1 = uint64(1);
 n2 = uint64(2^64-1);
@@ -58,8 +61,18 @@ disp('*******   This is really a big number!!! 18 million trillions *******')
 
 disp('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
 disp('%%%% CASE 2 MATH CORRECT RESULT using dySumUint64 function: n1 + n2 = ?%%%')
-[out1] = calllib('libdysum','dySumUint64',n1,n2,output);
-CORRECT_SumUint64mathRESULT = uint64(out1) %Must use uint64() type declation here
+%%[out1] = calllib('libdysum','dySumUint64',n1,n2,output);
+%%CORRECT_SumUint64mathRESULT = uint64(out1) %Must use uint64() type declation here
+
+if USE_MEX
+    
+   CORRECT_MexSumUint64mathRESULT = mexSumUint64(n1,n2)   
+   
+else   
+    
+  [out1] = calllib('libdysum','dySumUint64',n1,n2,output);
+  CORRECT_SumUint64mathRESULT = uint64(out1)  %Must use uint64() type declation here
+end;
 disp('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
 
 disp('CORRECT BECAUSE:  Note that output rolled over to 0 ') 
@@ -67,4 +80,6 @@ disp('CORRECT BECAUSE:  Note that output rolled over to 0 ')
 
 
 
+if ~ USE_MEX  
 unloadlibrary('libdysum');
+end;

@@ -11,6 +11,8 @@
 % converting your uint32 to double precision. You cannot even copy uint32
 % variables with out an uint32() type cast
 
+clear
+USE_MEX = logical(1);  % Edit this to use dylib instead of mex file
 
 t2 = uint32(2^32-1);
 t1 = uint32(1);
@@ -33,13 +35,14 @@ disp('INCORRECT BECAUSE:  result remained at MAX value of uint32')
 %Demonstrate dySum32 dynamic library function that performs integer32 register
 %overflow like a microprocessor performs unsigned integer register overflow
 
-if libisloaded( 'libdysum' )
+if ~USE_MEX
+    if libisloaded( 'libdysum' )
     unloadlibrary('libdysum');
-end;
-loadlibrary('libdysum');
+    end;
+    loadlibrary('libdysum');
 
-%libfunctionsview('libdysum')
- 
+    %libfunctionsview('libdysum')
+end; 
 
 n1 = uint32(1);
 n2 = uint32(2^32-1);
@@ -58,13 +61,20 @@ disp('About to Test Execution USING Matlab uint32() built-in ADDING method:  COR
 
 disp('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
 disp('%%%% CASE 2 MATH CORRECT RESULT using dySum32 function: n1 + n2 = ?%%%')
-[out1] = calllib('libdysum','dySumUint32',n1,n2,output);
-CORRECT_SumUint32mathRESULT = uint32(out1)  %Must use uint32() type declation here
+
+if USE_MEX
+   CORRECT_MexSumUint32mathRESULT = mexSumUint32(n1,n2)   
+else   
+    
+  [out1] = calllib('libdysum','dySumUint32',n1,n2,output);
+  CORRECT_SumUint32mathRESULT = uint32(out1)  %Must use uint32() type declation here
+end;
 disp('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
 
 disp('CORRECT BECAUSE:  the output rolled over to 0') 
 
 
 
-
+if ~ USE_MEX  
 unloadlibrary('libdysum');
+end;

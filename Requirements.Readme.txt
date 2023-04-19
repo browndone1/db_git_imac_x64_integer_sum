@@ -10,26 +10,57 @@ You will need Matlab 2017b
 However, other combinations of versions of Matlab and Xcode
     might work.
 
-Copy
-   libdysum.h
-   test*.m (test and example files)
-   To your Matlab working directory on your iMac
+Note: Github and file exchange contains same files, except:
+      The shared library files or the mex files are only available from Github.
 
 
-GitHub Files:
+    Note: Using libsysum.dylib guy is not working when copied to
+          a new x64 iMac for some reason I don't yet understand.
+    Therefore:  I am including my Mex versions of the same functions
+          which has been demonstrated to work when copied from my Github account.
 
-libdysum.dylib is available from GitHub
+
+
+IF USING libdysum.dylib
+
+    Do following
+
+I prefer the dylib method, because it is simpler to use and maintain.
+    But it does not always work when dylib copied to a new iMac.
+
+    Copy
+        libdysum.h
+        test*.m (test and example files)
+        To your Matlab working directory on your iMac
+
+
+     GitHub Files to copy:
+
+         libdysum.dylib is available from GitHub
          From:
          browndone1/db_git_imac_x64_integer_sum
          
          Then recopy dylib guy to your Matlab working directory on your iMac.
+
+IF using my Mex files (RECOMMENDED for now)
+   
+     Copy. (From GitHub)
+         test*.m files
+         mex/*.*. to your Matlab working folder
+
+Note: testdySumInt16.m will work for either mex or dylib file.
+      Just edit each test*.m type file: Change USE_MEX logical to select which one you want to use.
+      They are downloaded with USE_MEX enabled for use with the mex files.
+
+
+
 
 Note: When downloading txt file or m files from GitHub
       First select file, then when open select   'raw'.
       Then when open again, right click and select save as.
 
 
-To check for virus, you can run:
+To check dylib for virus, you can run:
 
     objdump -D -C libdysum.dylib
 
@@ -41,11 +72,11 @@ To check for virus, you can run:
   instructions to do the x64 register integer math
   With overflow enabled.
         
-Copy the test m files, which will explain
+The test m files, which will explain
  about register math vs Matlab math.
 
-These m file demonstrate how to call
- The functions in libdysum.dylib
+These m files also demonstrate how to call
+ The functions in libdysum.dylib or in the ex files.
 
 
 

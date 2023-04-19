@@ -12,6 +12,7 @@
 % variables without an uint8() type cast
 
 clear
+USE_MEX = logical(1);  % Edit this to use dylib instead of mex file
 
 t1 = uint8(1)
 t2 = uint8(2^8-1)
@@ -35,14 +36,14 @@ disp('INCORRECT 8bit result BECAUSE result remained at MAX value of uint8 = 255'
 %Demonstrate libsysum function that performs uint8 register
 %overflow like a microprocessor performs signed uint8 register overflow
 
-%unloadlibrary('libdysum');
-if libisloaded( 'libdysum' )
+if ~USE_MEX
+    if libisloaded( 'libdysum' )
     unloadlibrary('libdysum');
-end;
+    end;
+    loadlibrary('libdysum');
 
-loadlibrary('libdysum');
-
-%libfunctionsview('libdysum')
+    %libfunctionsview('libdysum')
+end; 
  
 
 
@@ -54,7 +55,6 @@ disp(' ')
 disp('CASE2:  ADD 2 uint8 numbers USING --dySumUchar8 function-- that implements microprocessor math CORRECTLY')
 uint8_RegisterValues = [n1,n2] %This is ONLY for conveying RegisterValue idea TO user in the command line display\
 
-output = uint8(33);
 out1 = uint8(44);
 
 disp('EXAMPLE CASE 2:  Add ABOVE 2 uint8 numbers CORRECTLY using --8 bit SIGNED unsigned integer Register math-- by calling "dySumUchar8"  function')
@@ -64,8 +64,16 @@ disp('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
 disp('%%%% CASE 2 MATH CORRECT RESULT using libdysum library %%%')
 
 %CORRECT_MexSumuint8mathRESULT = 
-[out1] = calllib('libdysum','dySumUchar8',n1,n2);   %%,output);
-CORRECT_MexSumuint8mathRESULT = uint8(out1) %Must use uint8() type declation here
+%%[out1] = calllib('libdysum','dySumUchar8',n1,n2);   %%,output);
+%%CORRECT_MexSumuint8mathRESULT = uint8(out1) %Must use uint8() type declation here
+
+if USE_MEX
+   CORRECT_MexSumUint8mathRESULT = mexSumUint8(n1,n2)   
+else   
+    
+  [out1] = calllib('libdysum','dySumUchar8',n1,n2);
+  CORRECT_SumUint8mathRESULT = uint8(out1)  %Must use uint8() type declation here
+end;
 disp('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
 
 disp('CORRECT BECAUSE:  the output rolled over to value: 0 ') 
@@ -73,4 +81,6 @@ disp('CORRECT BECAUSE:  the output rolled over to value: 0 ')
 
 
 
+if ~ USE_MEX  
 unloadlibrary('libdysum');
+end;

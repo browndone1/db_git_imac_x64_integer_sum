@@ -12,6 +12,7 @@
 % variables without an int8() type cast
 
 clear
+USE_MEX = logical(1);  % Edit this to use dylib instead of mex file
 
 t1 = int8(1)
 t2 = int8(2^7-1)
@@ -35,15 +36,15 @@ disp('INCORRECT 8bit result BECAUSE result remained at MAX value of int8 = 127')
 %Demonstrate libsysum function that performs int8 register
 %overflow like a microprocessor performs signed int8 register overflow
 
-%unloadlibrary('libdysum');
-if libisloaded( 'libdysum' )
+if ~USE_MEX
+    
+    if libisloaded( 'libdysum' )
     unloadlibrary('libdysum');
+    end;
+    loadlibrary('libdysum');
+
+    %libfunctionsview('libdysum')
 end;
-
-loadlibrary('libdysum');
-
-%libfunctionsview('libdysum')
- 
 
 
 n1 = int8(1);
@@ -54,7 +55,6 @@ disp(' ')
 disp('CASE2:  ADD 2 int8 numbers USING --dySumChar8 function-- that implements microprocessor math CORRECTLY')
 int8_RegisterValues = [n1,n2] %This is ONLY for conveying RegisterValue idea TO user in the command line display\
 
-output = int8(33);
 out1 = int8(44);
 
 disp('EXAMPLE CASE 2:  Add ABOVE 2 int8 numbers CORRECTLY using --8 bit SIGNED integer Register math-- by calling "dySumChar8"  function')
@@ -64,8 +64,15 @@ disp('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
 disp('%%%% CASE 2 MATH CORRECT RESULT using libdysum library %%%')
 
 %CORRECT_MexSumint8mathRESULT = 
-[out1] = calllib('libdysum','dySumChar8',n1,n2);   %%,output);
-CORRECT_MexSumint8mathRESULT = int8(out1) %Must use int8() type declation here
+%%[out1] = calllib('libdysum','dySumChar8',n1,n2);   %%,output);
+%%CORRECT_MexSumint8mathRESULT = int8(out1) %Must use int8() type declation here
+if USE_MEX
+   CORRECT_SumInt8mathRESULT = mexSumInt8(n1,n2)
+
+else
+   [out1] = calllib('libdysum','dySumChar8',n1,n2);
+   CORRECT_Sumint8mathRESULT = int8(out1) %Must use int8() type declation here
+end;
 disp('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
 
 disp('CORRECT BECAUSE:  the output rolled over to value: -128 ') 
@@ -73,4 +80,6 @@ disp('CORRECT BECAUSE:  the output rolled over to value: -128 ')
 
 
 
-unloadlibrary('libdysum');
+if ~ USE_MEX
+   unloadlibrary('libdysum');
+end;

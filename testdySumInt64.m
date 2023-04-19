@@ -10,6 +10,8 @@
 %calling dynamic library functions is critical to prevent matlab from
 %converting your int64 to double precision. You cannot even copy int64
 %variables without an int64() type cast
+clear
+USE_MEX = logical(1);  % Edit this to use dylib instead of mex file
 
 t1 = int64(1);
 t2 = int64(2^63-1);
@@ -33,14 +35,7 @@ disp('INCORRECT BECAUSE:  result remained at MAX value of int64 = 92233720368547
 %Demonstrate dySumInt64 dynamic library function that performs integer64 register
 %overflow like a microprocessor performs unsigned integer register overflow
 
-if libisloaded( 'libdysum' )
-    unloadlibrary('libdysum');
-end;
-loadlibrary('libdysum');
-
-%libfunctionsview('libdysum')
- 
-%return
+USE_MEX = logical(1);  % Edit this to use dylib instead of mex file
 
 n1 = int64(1);
 n2 = int64(2^63-1);
@@ -57,13 +52,19 @@ disp('About to Test Execution USING Matlab int64() built-in ADDING method:  CORR
 
 disp('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
 disp('%%%% CASE 2 MATH CORRECT RESULT using dySumInt64 function: n1 + n2 = ?%%%')
-[out1] = calllib('libdysum','dySumInt64',n1,n2,output);
-CORRECT_Sumint64mathRESULT = int64(out1) %Must use int64() type declation here
+if USE_MEX
+   CORRECT_SumInt64mathRESULT = mexSumInt64(n1,n2)
+
+else
+   [out1] = calllib('libdysum','dySumInt64',n1,n2,output);
+   CORRECT_Sumint64mathRESULT = int64(out1) %Must use int64() type declation here
+end;
 disp('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
 
-disp('CORRECT BECAUSE:  Note that output rolled over to MAX negative value: -9223372036854775808 ') 
+disp('CORRECT BECAUSE:  Note that output rolled over to MAX negative value: -9223372036854775807 ') 
 
 
 
-
-unloadlibrary('libdysum');
+if ~ USE_MEX
+   unloadlibrary('libdysum');
+end;
